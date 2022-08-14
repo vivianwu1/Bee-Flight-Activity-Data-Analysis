@@ -1,0 +1,56 @@
+import pandas as pd
+from ast import literal_eval
+import seaborn as sns
+from scipy.stats import gaussian_kde
+import numpy as np
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('File1.csv')
+df3 = pd.read_csv('File2.csv')
+df['AllTripDurations']=df['AllTripDurations'].apply(literal_eval)
+df3['AllTripDurations']=df3['AllTripDurations'].apply(literal_eval)
+all_durations = df['AllTripDurations'].explode()
+all_durations.name='duration'
+df2 = df.merge(all_durations,left_index=True,right_index=True).reset_index(drop=True)
+durations = df3['AllTripDurations'].explode()
+durations.name='duration'
+df4 = df3.merge(durations,left_index=True,right_index=True).reset_index(drop=True)
+df2['duration'] = df2['duration'].astype(float)
+df4['duration'] = df4['duration'].astype(float)
+#histogram for one data set
+sns.histplot(data=df2,x='duration',kde=False,stat='density')
+plt.xticks(ticks = [0, 15, 30, 45, 60], labels = ['0m','15m','30m', '45m', '60m'])
+
+
+#histogram and kernel density plot for one data set
+sns.histplot(data=df4,x='duration',kde=False,stat='density')
+sns.kdeplot(data=df4,x='duration',color='yellow')
+plt.xticks(ticks = [0, 15, 30, 45, 60], labels = ['0m','15m','30m', '45m', '60m'])
+
+
+#histogram and kernel density plot for 2 data sets
+fig, ax = plt.subplots()
+sns.histplot(data=df2,x='duration',kde=True,stat='density', ax=ax, color = 'blue', alpha = 0.15)
+ax.set_xticks(ticks = [0, 15, 30, 45, 60], labels = ['0m','15m','30m', '45m', '60m'])
+ax.set_xlim((-1,61))
+sns.histplot(data=df4,x='duration',kde=True,stat='density', ax=ax, color ='orange', alpha = 0.15)
+
+
+#kernel density plot for 2 data sets
+fig, ax = plt.subplots()
+sns.kdeplot(data=df2,x='duration', ax=ax, color = 'blue')
+ax.set_xticks(ticks = [0, 15, 30, 45, 60], labels = ['0m','15m','30m', '45m', '60m'])
+ax.set_xlim((-1,61))
+sns.kdeplot(data=df4,x='duration', ax=ax, color ='orange')
+from scipy.optimize import minimize
+
+#find x and y coordinates of relative maxima
+pdf = gaussian_kde(df4['duration'].dropna())
+def maximize_pdf(x):
+    return -1*pdf(x[0])
+max_durations = []
+max_densities = []
+r = minimize(maximize_pdf,[20],bounds=[(15,30)])
+max_durations.append(r.x[0])
+max_densities.append(r.fun*-1)
+r.x[0], r.fun*-1
