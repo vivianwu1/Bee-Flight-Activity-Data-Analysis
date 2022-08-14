@@ -109,7 +109,7 @@ for key in timestamp_dictionary:
             timestamp_list.append(round(current_check,4))
             if current_check <= 3:
                 short +=1
-            elif current_check <= 6:
+            elif current_check <= 8:
                 medium += 1
                 lengthNew += 1
                 total_time += current_check
@@ -148,7 +148,7 @@ for key in timestamp_dictionary:
             timestamp_list.append(round(current_check,4))
             if current_check <= 3:
                 short +=1
-            elif current_check <= 6:
+            elif current_check <= 8:
                 medium += 1
                 total_time += current_check
                 med_total_time += current_check
